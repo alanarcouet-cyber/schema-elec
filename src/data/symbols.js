@@ -1,0 +1,57 @@
+export const INITIAL_SYMBOLS = [
+  {
+    id: 'interrupteur_aerien_bt',
+    name: 'Interrupteur aérien BT',
+    pngPath: '/symbols/interrupteur_aerien_bt.png',
+    displayWidth: 90,
+    displayHeight: 60,
+    type: 'BT',
+    labelPrefix: 'IAB',
+    bornes: [
+      { x: 52, y: 0,  name: 'A' },
+      { x: 20, y: 60, name: 'B' },
+    ],
+  },
+  {
+    id: 'tete_cable_bt',
+    name: 'Tête câble BT',
+    pngPath: '/symbols/tete_cable_bt.png',
+    displayWidth: 80,
+    displayHeight: 80,
+    type: 'BT',
+    labelPrefix: 'TCB',
+    bornes: [
+      { x: 10, y: 0,  name: '1' },
+      { x: 27, y: 0,  name: '2' },
+      { x: 53, y: 0,  name: '3' },
+      { x: 70, y: 0,  name: '4' },
+      { x: 40, y: 80, name: 'N' },
+    ],
+  },
+  {
+    id: 'tete_cable_hta_terre',
+    name: 'Tête câble HTA + Terre',
+    pngPath: '/symbols/tete_cable_hta_terre.png',
+    displayWidth: 100,
+    displayHeight: 55,
+    type: 'HTA',
+    labelPrefix: 'TCH',
+    bornes: [
+      { x: 65, y: 0,  name: 'A' },
+      { x: 82, y: 55, name: 'B' },
+    ],
+  },
+  {
+    id: 'tete_cable_hta',
+    name: 'Tête câble HTA',
+    pngPath: '/symbols/tete_cable_hta.png',
+    displayWidth: 60,
+    displayHeight: 60,
+    type: 'HTA',
+    labelPrefix: 'TH',
+    bornes: [
+      { x: 28, y: 0,  name: 'A' },
+      { x: 46, y: 60, name: 'B' },
+    ],
+  },
+]

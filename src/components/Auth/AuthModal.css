@@ -1,0 +1,122 @@
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #0f1b3d 0%, #1a3a6e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-modal {
+  background: white;
+  padding: 2rem 2.2rem;
+  border-radius: 10px;
+  width: 340px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.auth-bolt { font-size: 1.8rem; }
+
+.auth-logo h1 {
+  font-size: 1.25rem;
+  color: #1a3a6e;
+  font-weight: 700;
+}
+
+.auth-subtitle {
+  font-size: 0.78rem;
+  color: #888;
+  margin-bottom: 1.4rem;
+}
+
+.auth-modal h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.auth-modal input {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.7rem;
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.92rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.auth-modal input:focus {
+  outline: none;
+  border-color: #1a3a6e;
+}
+
+.auth-modal button[type="submit"] {
+  width: 100%;
+  padding: 0.7rem;
+  background: #1a3a6e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.4rem;
+  transition: background 0.15s;
+}
+
+.auth-modal button[type="submit"]:hover:not(:disabled) { background: #244d8f; }
+.auth-modal button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+
+.auth-error {
+  color: #c0392b;
+  font-size: 0.82rem;
+  margin: 0 0 0.6rem;
+  padding: 0.4rem 0.6rem;
+  background: #fef2f2;
+  border-radius: 4px;
+}
+
+.auth-info {
+  color: #16a34a;
+  font-size: 0.82rem;
+  margin: 0 0 0.6rem;
+  padding: 0.4rem 0.6rem;
+  background: #f0fdf4;
+  border-radius: 4px;
+}
+
+.auth-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.auth-switch {
+  display: block;
+  background: none;
+  border: none;
+  color: #1a3a6e;
+  cursor: pointer;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-forgot {
+  color: #888;
+  font-size: 0.78rem;
+}

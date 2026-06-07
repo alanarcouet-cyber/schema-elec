@@ -1,0 +1,249 @@
+.toolbar {
+  height: 50px;
+  background: #1a3a6e;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tb-bolt { font-size: 1.4rem; }
+
+.tb-title {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px;
+  color: white;
+  padding: 4px 10px;
+  font-size: 0.88rem;
+  width: 190px;
+}
+
+.tb-title:focus { outline: none; background: rgba(255,255,255,0.18); }
+
+.tb-tools {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 7px;
+  padding: 4px 5px;
+}
+
+.tb-tool {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.tb-tool:hover:not(:disabled) { background: rgba(255,255,255,0.18); color: white; }
+.tb-tool.active { background: rgba(255,255,255,0.28); color: white; }
+.tb-tool.danger:not(:disabled):hover { background: rgba(220,50,50,0.4); }
+.tb-tool:disabled { opacity: 0.35; cursor: default; }
+
+.tb-sep {
+  width: 1px;
+  height: 22px;
+  background: rgba(255,255,255,0.25);
+  margin: 0 3px;
+}
+
+.tb-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tb-btn {
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: white;
+  padding: 5px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+
+.tb-btn:hover:not(:disabled) { background: rgba(255,255,255,0.24); }
+.tb-btn:disabled { opacity: 0.5; cursor: default; }
+.tb-btn.primary { background: rgba(37,99,235,0.7); border-color: rgba(37,99,235,0.9); }
+.tb-btn.primary:hover { background: rgba(37,99,235,0.9); }
+.tb-btn.logout { background: rgba(185,28,28,0.4); border-color: rgba(185,28,28,0.6); }
+.tb-btn.logout:hover { background: rgba(185,28,28,0.6); }
+
+.tb-export-group {
+  display: flex;
+  gap: 3px;
+}
+
+/* ── Deuxième barre — types de câbles ── */
+.cable-toolbar {
+  height: 38px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.cable-toolbar-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.cable-toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.76rem;
+  color: #374151;
+  transition: background 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.cable-toolbar-btn:hover { background: #e8f0fe; border-color: #93c5fd; }
+.cable-toolbar-btn.active { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: 600; }
+
+.tb-user {
+  font-size: 0.72rem;
+  opacity: 0.6;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Schema list panel */
+.schemas-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.schemas-panel {
+  background: white;
+  border-radius: 8px;
+  width: 420px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+}
+
+.schemas-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.schemas-panel-header h3 { flex: 1; font-size: 1rem; color: #1a3a6e; }
+
+.schemas-panel-header button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.schemas-empty { padding: 20px 16px; color: #888; font-size: 0.9rem; }
+
+.schema-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.schema-row:hover { background: #f5f8ff; }
+
+.schema-row-title { flex: 1; font-size: 0.9rem; color: #222; }
+
+.schema-row-date { font-size: 0.75rem; color: #999; margin-right: 8px; }
+
+.schema-row-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.schema-row:hover .schema-row-actions { opacity: 1; }
+
+.schema-action-btn {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+.schema-action-btn:hover { background: #f3f4f6; color: #111; }
+.schema-action-btn.danger:hover { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+
+/* #10 — Indicateur non sauvegardé */
+.tb-dirty {
+  color: #f59e0b;
+  font-size: 0.65rem;
+  line-height: 1;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* #9 — Label auto-save */
+.tb-autosave {
+  font-size: 0.68rem;
+  opacity: 0.65;
+  white-space: nowrap;
+  font-style: italic;
+}
