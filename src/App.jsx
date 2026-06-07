@@ -60,7 +60,7 @@ export default function App() {
 
         if (error) return
         const allData = data || []
-        if (!allData.length && !missing.length) return
+        if (!allData.length) return
 
         const dbSymbols = allData.map(row => ({
           id:              row.id,
@@ -167,11 +167,10 @@ export default function App() {
   }
 
   const handleDeleteSymbol = async (id) => {
-    const sym = canvas.symbols.find(s => s.id === id)
     canvas.setSymbols(prev => prev.filter(s => s.id !== id))
-    if (sym?._fromDb) {
-      await supabase.from('symbol_library').delete().eq('id', id).catch(() => {})
-    }
+    // Toujours tenter la suppression en DB (pas de dépendance sur _fromDb)
+    const { error } = await supabase.from('symbol_library').delete().eq('id', id)
+    if (error) console.warn('Erreur suppression symbole:', error.message)
   }
 
   if (loading) return <div className="app-loading">Chargement…</div>
