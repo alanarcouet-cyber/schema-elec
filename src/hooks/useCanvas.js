@@ -159,6 +159,7 @@ export default function useCanvas() {
       return commit(prev, {
         elements: prev.elements.filter(el => el.id !== id),
         cables: prev.cables.filter(c =>
+          c.id !== id &&                                 // câble lui-même sélectionné
           c.fromElementId !== id && c.toElementId !== id &&
           c.fromAnchorId !== id && c.toAnchorId !== id
         ),
