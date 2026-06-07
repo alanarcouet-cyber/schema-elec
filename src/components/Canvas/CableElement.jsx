@@ -1,5 +1,5 @@
 import { Line, Text } from 'react-konva'
-import { getCableEndpoints, routeOrthogonalAvoid } from '../../utils/routing'
+import { getCableEndpoints, routeOrthogonalAvoid, buildElementBoxes } from '../../utils/routing'
 
 export const CABLE_STYLES = {
   HTA_EXIST: { color: '#dc2626', width: 3,   dash: [] },
@@ -24,7 +24,12 @@ export default function CableElement({
   const { fromPos, toPos } = getCableEndpoints(cable, elements, symbols, anchors)
   if (!fromPos || !toPos) return null
 
-  const points = routeOrthogonalAvoid(fromPos.x, fromPos.y, toPos.x, toPos.y, priorRoutes)
+  // Boîtes de tous les symboles sauf ceux connectés à ce câble
+  const elementBoxes = buildElementBoxes(elements, symbols, [
+    cable.fromElementId, cable.toElementId,
+  ])
+
+  const points = routeOrthogonalAvoid(fromPos.x, fromPos.y, toPos.x, toPos.y, priorRoutes, elementBoxes)
   const style = CABLE_STYLES[cable.type] || CABLE_STYLES.BT_EXIST
   const { color, width, dash } = style
 

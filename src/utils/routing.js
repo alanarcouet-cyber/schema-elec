@@ -76,28 +76,104 @@ function collinearOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
   return false
 }
 
+// ── Symbol bounding boxes (AABB) for avoidance ───────────────────────────────
+
+const AVOID_PADDING = 12   // extra px around each symbol
+
+/** Axis-aligned bounding box of a (possibly rotated) element, with padding */
+export function getElementAABB(element, symbol) {
+  if (!symbol) return null
+  const w   = symbol.displayWidth  || 80
+  const h   = symbol.displayHeight || 80
+  const cx  = element.x + w / 2
+  const cy  = element.y + h / 2
+  const rot = ((element.rotation || 0) * Math.PI) / 180
+  const cos = Math.abs(Math.cos(rot))
+  const sin = Math.abs(Math.sin(rot))
+  const hw  = (w * cos + h * sin) / 2 + AVOID_PADDING
+  const hh  = (w * sin + h * cos) / 2 + AVOID_PADDING
+  return { x1: cx - hw, y1: cy - hh, x2: cx + hw, y2: cy + hh }
+}
+
+/** Build AABB list for all elements, optionally excluding some IDs */
+export function buildElementBoxes(elements, symbols, excludeIds = []) {
+  const excl = new Set(excludeIds.filter(Boolean))
+  return elements
+    .filter(el => !excl.has(el.id))
+    .map(el => {
+      const sym = symbols.find(s => s.id === el.symbolId)
+      return getElementAABB(el, sym)
+    })
+    .filter(Boolean)
+}
+
+/** Does an axis-aligned segment cross (or touch) a box? */
+function segCrossesBox(sx1, sy1, sx2, sy2, box) {
+  const EPS = 1
+  if (Math.abs(sy1 - sy2) < EPS) {
+    // Horizontal segment
+    const y = sy1
+    if (y <= box.y1 + EPS || y >= box.y2 - EPS) return false
+    const xMin = Math.min(sx1, sx2), xMax = Math.max(sx1, sx2)
+    return xMax > box.x1 + EPS && xMin < box.x2 - EPS
+  }
+  if (Math.abs(sx1 - sx2) < EPS) {
+    // Vertical segment
+    const x = sx1
+    if (x <= box.x1 + EPS || x >= box.x2 - EPS) return false
+    const yMin = Math.min(sy1, sy2), yMax = Math.max(sy1, sy2)
+    return yMax > box.y1 + EPS && yMin < box.y2 - EPS
+  }
+  return false
+}
+
+/** Does any segment of a route cross any box? */
+function routeCrossesBoxes(pts, boxes) {
+  for (const [ax1, ay1, ax2, ay2] of toSegments(pts)) {
+    for (const box of boxes) {
+      if (segCrossesBox(ax1, ay1, ax2, ay2, box)) return true
+    }
+  }
+  return false
+}
+
 // Route orthogonally, shifting midX to avoid overlapping prior cable segments
-export function routeOrthogonalAvoid(x1, y1, x2, y2, priorPointArrays) {
-  const STEP = 5
+// and element bounding boxes.
+export function routeOrthogonalAvoid(x1, y1, x2, y2, priorPointArrays, elementBoxes = []) {
+  const STEP    = 20
+  const MAX_TRY = 16
   let midX = (x1 + x2) / 2
-  if (!priorPointArrays?.length) return routeOrthogonal(x1, y1, x2, y2)
+  const hasPrior = priorPointArrays?.length > 0
+  const hasBoxes = elementBoxes.length > 0
+  if (!hasPrior && !hasBoxes) return routeOrthogonal(x1, y1, x2, y2)
 
   const mk = () => [x1, y1, midX, y1, midX, y2, x2, y2]
 
-  for (let tries = 0; tries < 8; tries++) {
-    const newSegs = toSegments(mk())
+  for (let tries = 0; tries < MAX_TRY; tries++) {
+    const pts     = mk()
+    const newSegs = toSegments(pts)
+
+    // Check overlap with prior cable segments
     let overlap = false
-    outer: for (const prior of priorPointArrays) {
-      for (const [ax1, ay1, ax2, ay2] of newSegs) {
-        for (const [bx1, by1, bx2, by2] of toSegments(prior)) {
-          if (collinearOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)) {
-            overlap = true; break outer
+    if (hasPrior) {
+      outer: for (const prior of priorPointArrays) {
+        for (const [ax1, ay1, ax2, ay2] of newSegs) {
+          for (const [bx1, by1, bx2, by2] of toSegments(prior)) {
+            if (collinearOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)) {
+              overlap = true; break outer
+            }
           }
         }
       }
     }
+
+    // Check intersection with element boxes
+    if (!overlap && hasBoxes) {
+      overlap = routeCrossesBoxes(pts, elementBoxes)
+    }
+
     if (!overlap) break
-    // Alternate: shift right, then left, further each time
+    // Alternate: shift right then left, further each time
     midX = (x1 + x2) / 2 + (tries % 2 === 0 ? 1 : -1) * STEP * (Math.floor(tries / 2) + 1)
   }
 
