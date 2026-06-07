@@ -3,10 +3,11 @@ import PaletteItem from './PaletteItem'
 import './Palette.css'
 
 export default function Palette({ symbols, onAddSymbol, onConfigureSymbol, onReorderSymbols }) {
-  const fileRef = useRef(null)
-  const [dragIdx, setDragIdx]       = useState(null)   // index being dragged
-  const [overIdx, setOverIdx]       = useState(null)   // index currently hovered
-  const [insertPos, setInsertPos]   = useState(null)   // 'before' | 'after'
+  const fileRef      = useRef(null)
+  const insertPosRef = useRef(null)   // ref pour éviter closure périmée dans handleDrop
+  const [dragIdx,    setDragIdx]    = useState(null)
+  const [overIdx,    setOverIdx]    = useState(null)
+  const [insertPos,  setInsertPos]  = useState(null)  // gardé pour l'affichage des lignes
 
   const handleDragStart = useCallback((e, index, symbolId) => {
     e.dataTransfer.setData('symbolId', symbolId)
@@ -19,14 +20,15 @@ export default function Palette({ symbols, onAddSymbol, onConfigureSymbol, onReo
     if (!e.dataTransfer.types.includes('paletteindex')) return
     e.preventDefault()
     e.stopPropagation()
-    // Determine insert position from cursor position within the item
     const rect = e.currentTarget.getBoundingClientRect()
-    const mid  = rect.top + rect.height / 2
+    const pos  = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after'
+    insertPosRef.current = pos   // toujours à jour, lu directement dans handleDrop
     setOverIdx(index)
-    setInsertPos(e.clientY < mid ? 'before' : 'after')
+    setInsertPos(pos)
   }, [])
 
   const handleDragEnd = useCallback(() => {
+    insertPosRef.current = null
     setDragIdx(null)
     setOverIdx(null)
     setInsertPos(null)
@@ -40,17 +42,17 @@ export default function Palette({ symbols, onAddSymbol, onConfigureSymbol, onReo
     const srcIdx = parseInt(raw, 10)
     if (isNaN(srcIdx)) return
 
-    // Compute real destination index
+    // Lire la ref, pas le state (pas de closure périmée)
     let destIdx = index
-    if (insertPos === 'after') destIdx = index + 1
-    // Adjust for the gap left by removing the source
+    if (insertPosRef.current === 'after') destIdx = index + 1
     if (srcIdx < destIdx) destIdx -= 1
     if (srcIdx !== destIdx) onReorderSymbols(srcIdx, destIdx)
 
+    insertPosRef.current = null
     setDragIdx(null)
     setOverIdx(null)
     setInsertPos(null)
-  }, [insertPos, onReorderSymbols])
+  }, [onReorderSymbols])   // plus de dépendance sur insertPos !
 
   return (
     <div className="palette">
