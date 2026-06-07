@@ -28,8 +28,10 @@ export default function PaletteItem({
             onError={e => { e.target.style.display = 'none' }}
           />
         </div>
-        <span className="palette-item-name">{symbol.name}</span>
-        <span className={`palette-item-type ${symbol.type}`}>{symbol.type}</span>
+        <div className="palette-item-info">
+          <span className="palette-item-name">{symbol.name}</span>
+          <span className={`palette-item-type ${symbol.type}`}>{symbol.type}</span>
+        </div>
         <button
           className="palette-item-config-btn"
           title="Configurer le symbole"

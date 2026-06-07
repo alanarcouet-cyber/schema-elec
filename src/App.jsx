@@ -38,12 +38,12 @@ export default function App() {
       .select('*')
       .order('sort_order', { ascending: true })
       .then(async ({ data, error }) => {
-        // #12 — Seed INITIAL_SYMBOLS to DB if missing
-        const existingIds = new Set((data || []).map(r => r.id))
-        const missing = INITIAL_SYMBOLS.filter(s => !existingIds.has(s.id))
-        if (missing.length) {
+        // #12 — Seed INITIAL_SYMBOLS uniquement si la bibliothèque est vide
+        // (ne pas re-seeder si l'utilisateur a supprimé des symboles)
+        const allRows = data || []
+        if (allRows.length === 0) {
           await supabase.from('symbol_library').insert(
-            missing.map((s, i) => ({
+            INITIAL_SYMBOLS.map((s, i) => ({
               id:               s.id,
               name:             s.name,
               png_url:          s.pngPath,
