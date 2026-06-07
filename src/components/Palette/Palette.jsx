@@ -20,9 +20,11 @@ export default function Palette({ symbols, onAddSymbol, onConfigureSymbol, onReo
     if (!e.dataTransfer.types.includes('paletteindex')) return
     e.preventDefault()
     e.stopPropagation()
-    const rect = e.currentTarget.getBoundingClientRect()
+    // Utilise le rect du .palette-item (enfant du wrapper) pour un mid-point précis
+    const item = e.currentTarget.querySelector('.palette-item') ?? e.currentTarget
+    const rect = item.getBoundingClientRect()
     const pos  = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after'
-    insertPosRef.current = pos   // toujours à jour, lu directement dans handleDrop
+    insertPosRef.current = pos
     setOverIdx(index)
     setInsertPos(pos)
   }, [])

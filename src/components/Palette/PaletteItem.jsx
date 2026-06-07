@@ -8,15 +8,17 @@ export default function PaletteItem({
   const src = useTransparentSrc(symbol.pngPath)
 
   return (
-    <div className="palette-item-wrapper">
+    <div
+      className="palette-item-wrapper"
+      onDragOver={e => onDragOver(e, index)}
+      onDrop={e => onDrop(e, index)}
+    >
       {insertBefore && <div className="palette-insert-line" />}
       <div
         className={`palette-item${isDragging ? ' dragging' : ''}`}
         draggable
         onDragStart={e => onDragStart(e, index, symbol.id)}
-        onDragOver={e => onDragOver(e, index)}
         onDragEnd={onDragEnd}
-        onDrop={e => onDrop(e, index)}
         title={symbol.name}
       >
         <div className="palette-drag-handle" title="Réorganiser">⠿</div>
