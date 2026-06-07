@@ -44,15 +44,16 @@ export default function App() {
         if (missing.length) {
           await supabase.from('symbol_library').insert(
             missing.map((s, i) => ({
-              id:             s.id,
-              name:           s.name,
-              png_url:        s.pngPath,
-              display_width:  s.displayWidth,
-              display_height: s.displayHeight,
-              type:           s.type,
-              label_prefix:   s.labelPrefix || '',
-              bornes:         s.bornes,
-              sort_order:     i,
+              id:               s.id,
+              name:             s.name,
+              png_url:          s.pngPath,
+              display_width:    s.displayWidth,
+              display_height:   s.displayHeight,
+              type:             s.type,
+              label_prefix:     s.labelPrefix     || '',
+              default_rotation: s.defaultRotation ?? 0,
+              bornes:           s.bornes,
+              sort_order:       i,
             }))
           ).catch(() => {})
         }
@@ -62,15 +63,16 @@ export default function App() {
         if (!allData.length && !missing.length) return
 
         const dbSymbols = allData.map(row => ({
-          id:            row.id,
-          name:          row.name,
-          pngPath:       row.png_url,
-          displayWidth:  row.display_width  || 80,
-          displayHeight: row.display_height || 80,
-          type:          row.type           || 'BT',
-          labelPrefix:   row.label_prefix   || '',
-          bornes:        row.bornes         || [],
-          _fromDb:       true,
+          id:              row.id,
+          name:            row.name,
+          pngPath:         row.png_url,
+          displayWidth:    row.display_width    || 80,
+          displayHeight:   row.display_height   || 80,
+          type:            row.type             || 'BT',
+          labelPrefix:     row.label_prefix     || '',
+          defaultRotation: row.default_rotation ?? 0,
+          bornes:          row.bornes           || [],
+          _fromDb:         true,
         }))
         canvas.setSymbols(prev => {
           const prevIds = new Set(prev.map(s => s.id))
@@ -153,12 +155,13 @@ export default function App() {
     // Sync to DB if it was a shared symbol
     if (updated._fromDb) {
       await supabase.from('symbol_library').update({
-        name: updated.name,
-        display_width: updated.displayWidth,
-        display_height: updated.displayHeight,
-        type: updated.type,
-        label_prefix: updated.labelPrefix || '',
-        bornes: updated.bornes,
+        name:             updated.name,
+        display_width:    updated.displayWidth,
+        display_height:   updated.displayHeight,
+        type:             updated.type,
+        label_prefix:     updated.labelPrefix     || '',
+        default_rotation: updated.defaultRotation ?? 0,
+        bornes:           updated.bornes,
       }).eq('id', updated.id).catch(() => {})
     }
   }

@@ -47,7 +47,8 @@ export default function useCanvas() {
       return commit(prev, {
         selectedId: newId,
         elements: [...prev.elements, {
-          id: newId, symbolId, x, y, rotation: 0,
+          id: newId, symbolId, x, y,
+          rotation: sym.defaultRotation ?? 0,
           label: `${prefix}${count}`, labelOffsetX: 0, labelOffsetY: 0,
         }],
       })

@@ -31,15 +31,17 @@ create table if not exists symbol_library (
   display_width  integer   default 80,
   display_height integer   default 80,
   type         text        default 'BT',       -- BT | HTA | POSTE
-  label_prefix text        default '',
-  bornes       jsonb       default '[]',
+  label_prefix     text     default '',
+  default_rotation integer  default 0,   -- 0 | 90 | 180 | 270
+  bornes           jsonb    default '[]',
   sort_order   integer     default 0,
   created_by   uuid        references auth.users(id) on delete set null,
   created_at   timestamptz default now()
 );
 
--- Migration : ajouter label_prefix si la table existe déjà
-alter table symbol_library add column if not exists label_prefix text default '';
+-- Migrations : ajouter les colonnes si la table existe déjà
+alter table symbol_library add column if not exists label_prefix     text    default '';
+alter table symbol_library add column if not exists default_rotation integer default 0;
 
 alter table symbol_library enable row level security;
 
