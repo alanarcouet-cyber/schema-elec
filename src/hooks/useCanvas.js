@@ -159,7 +159,7 @@ export default function useCanvas() {
       return commit(prev, {
         elements: prev.elements.filter(el => el.id !== id),
         cables: prev.cables.filter(c =>
-          c.id !== id &&                                 // câble lui-même sélectionné
+          c.id !== id &&
           c.fromElementId !== id && c.toElementId !== id &&
           c.fromAnchorId !== id && c.toAnchorId !== id
         ),
@@ -168,6 +168,21 @@ export default function useCanvas() {
         selectedId: null,
       })
     })
+  }, [])
+
+  // Suppression directe par id (sans passer par selectedId)
+  const deleteById = useCallback((id) => {
+    setState(prev => commit(prev, {
+      elements: prev.elements.filter(el => el.id !== id),
+      cables: prev.cables.filter(c =>
+        c.id !== id &&
+        c.fromElementId !== id && c.toElementId !== id &&
+        c.fromAnchorId !== id && c.toAnchorId !== id
+      ),
+      comments: prev.comments.filter(c => c.id !== id),
+      anchors:  prev.anchors.filter(a => a.id !== id),
+      selectedId: null,
+    }))
   }, [])
 
   // ── Comments ──────────────────────────────────────────────────────────────
@@ -289,6 +304,7 @@ export default function useCanvas() {
     addAnchor,
     moveAnchor,
     deleteSelected,
+    deleteById,
     addComment,
     moveComment,
     updateComment,

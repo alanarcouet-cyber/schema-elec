@@ -318,6 +318,7 @@ export default function CanvasStage({ canvas, stageRef, remoteCursors = {}, onCu
               onSelect={canvas.selectElement}
               onMove={canvas.moveAnchor}
               onAnchorBorneClick={handleAnchorBorneClick}
+              onDelete={() => canvas.deleteById(anchor.id)}
             />
           ))}
 
