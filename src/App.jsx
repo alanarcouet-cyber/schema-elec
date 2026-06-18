@@ -144,17 +144,25 @@ export default function App() {
 
     // Persist to shared library if upload succeeded
     if (uploadedToStorage) {
-      await supabase.from('symbol_library').insert({
+      const { error: insErr } = await supabase.from('symbol_library').insert({
         id,
         name,
-        png_url: pngPath,
-        display_width: 80,
-        display_height: 80,
-        type: 'BT',
-        bornes: newSym.bornes,
-        sort_order: 9999,
-        created_by: session?.user?.id,
-      }).catch(() => {})
+        png_url:          pngPath,
+        display_width:    80,
+        display_height:   80,
+        type:             'BT',
+        label_prefix:     '',
+        default_rotation: 0,
+        bornes:           newSym.bornes,
+        sort_order:       9999,
+        created_by:       session?.user?.id,
+      })
+      if (insErr) {
+        console.error('Erreur insertion symbole en base:', insErr.message)
+        alert('Le symbole n’a pas pu être enregistré en base : ' + insErr.message)
+      }
+    } else {
+      alert('L’image n’a pas pu être envoyée au stockage : le symbole ne sera pas conservé après rafraîchissement.')
     }
 
     // Open editor immediately so user can configure bornes/name
