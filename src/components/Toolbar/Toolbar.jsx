@@ -35,6 +35,27 @@ export default function Toolbar({ canvas, stageRef, schemaId, setSchemaId, sessi
   const [isDirty, setIsDirty]         = useState(false)
   const lastSavedRef                  = useRef(null)
 
+  // ── Persistance du dernier schéma ouvert ───────────────────────────────────
+  // Sauvegarde schemaId dans localStorage pour le retrouver après refresh
+  useEffect(() => {
+    if (schemaId) localStorage.setItem('lastSchemaId', schemaId)
+    else          localStorage.removeItem('lastSchemaId')
+  }, [schemaId])
+
+  // Auto-chargement au montage (après login) si un schéma était ouvert
+  useEffect(() => {
+    const lastId = localStorage.getItem('lastSchemaId')
+    if (!lastId) return
+    supabase.from('schemas').select('*').eq('id', lastId).single()
+      .then(({ data }) => {
+        if (!data) { localStorage.removeItem('lastSchemaId'); return }
+        canvas.loadState(data.data)
+        setTitle(data.title)
+        setSchemaId(data.id)
+        resetDirty()
+      })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Dirty tracking (#10) ────────────────────────────────────────────────────
   const canvasDataStr = useMemo(() =>
     JSON.stringify({ e: canvas.elements, c: canvas.cables, co: canvas.comments, a: canvas.anchors }),
