@@ -34,56 +34,67 @@ export default function App() {
   // ── Load + seed shared symbols from Supabase on login ────────────────────
   useEffect(() => {
     if (!session) return
-    supabase.from('symbol_library')
-      .select('*')
-      .order('sort_order', { ascending: true })
-      .then(async ({ data, error }) => {
-        // #12 — Seed INITIAL_SYMBOLS uniquement si la bibliothèque est vide
-        // (ne pas re-seeder si l'utilisateur a supprimé des symboles)
-        const allRows = data || []
-        if (allRows.length === 0) {
-          await supabase.from('symbol_library').insert(
-            INITIAL_SYMBOLS.map((s, i) => ({
-              id:               s.id,
-              name:             s.name,
-              png_url:          s.pngPath,
-              display_width:    s.displayWidth,
-              display_height:   s.displayHeight,
-              type:             s.type,
-              label_prefix:     s.labelPrefix     || '',
-              default_rotation: s.defaultRotation ?? 0,
-              bornes:           s.bornes,
-              sort_order:       i,
-            }))
-          ).catch(() => {})
-        }
 
-        if (error) return
-        const allData = data || []
-        if (!allData.length) return
+    const loadSymbols = async () => {
+      let { data, error } = await supabase
+        .from('symbol_library')
+        .select('*')
+        .order('sort_order', { ascending: true })
 
-        const dbSymbols = allData.map(row => ({
-          id:              row.id,
-          name:            row.name,
-          pngPath:         row.png_url,
-          displayWidth:    row.display_width    || 80,
-          displayHeight:   row.display_height   || 80,
-          type:            row.type             || 'BT',
-          labelPrefix:     row.label_prefix     || '',
-          defaultRotation: row.default_rotation ?? 0,
-          bornes:          row.bornes           || [],
-          _fromDb:         true,
-        }))
-        canvas.setSymbols(prev => {
-          const prevIds = new Set(prev.map(s => s.id))
-          const newSymbols = dbSymbols.filter(s => !prevIds.has(s.id))
-          // Replace INITIAL_SYMBOLS with their DB versions (which have _fromDb: true)
-          return [
-            ...prev.map(s => dbSymbols.find(d => d.id === s.id) || s),
-            ...newSymbols,
-          ]
-        })
+      if (error) return
+
+      // Seed si la bibliothèque est vide, puis re-fetcher pour avoir _fromDb: true
+      if (!data?.length) {
+        await supabase.from('symbol_library').insert(
+          INITIAL_SYMBOLS.map((s, i) => ({
+            id:               s.id,
+            name:             s.name,
+            png_url:          s.pngPath,
+            display_width:    s.displayWidth,
+            display_height:   s.displayHeight,
+            type:             s.type,
+            label_prefix:     s.labelPrefix     || '',
+            default_rotation: s.defaultRotation ?? 0,
+            bornes:           s.bornes,
+            sort_order:       i,
+          }))
+        )
+        // Re-fetch pour que les symboles aient bien _fromDb: true
+        const refetch = await supabase
+          .from('symbol_library')
+          .select('*')
+          .order('sort_order', { ascending: true })
+        if (refetch.error) return
+        data = refetch.data
+      }
+
+      if (!data?.length) return
+
+      const dbSymbols = data.map(row => ({
+        id:              row.id,
+        name:            row.name,
+        pngPath:         row.png_url,
+        displayWidth:    row.display_width    || 80,
+        displayHeight:   row.display_height   || 80,
+        type:            row.type             || 'BT',
+        labelPrefix:     row.label_prefix     || '',
+        defaultRotation: row.default_rotation ?? 0,
+        bornes:          row.bornes           || [],
+        _fromDb:         true,
+      }))
+
+      canvas.setSymbols(prev => {
+        const byId = Object.fromEntries(dbSymbols.map(s => [s.id, s]))
+        const prevIds = new Set(prev.map(s => s.id))
+        const newSymbols = dbSymbols.filter(s => !prevIds.has(s.id))
+        return [
+          ...prev.map(s => byId[s.id] || s),  // remplace par version DB (avec _fromDb: true)
+          ...newSymbols,
+        ]
       })
+    }
+
+    loadSymbols()
   }, [session]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Realtime collaboration ────────────────────────────────────────────────
