@@ -32,7 +32,7 @@ create table if not exists symbol_library (
   display_height integer   default 80,
   type         text        default 'BT',       -- BT | HTA | POSTE
   label_prefix     text     default '',
-  default_rotation integer  default 0,   -- 0 | 90 | 180 | 270
+  default_rotation real     default 0,   -- orientation par défaut en degrés (0–360)
   bornes           jsonb    default '[]',
   sort_order   integer     default 0,
   created_by   uuid        references auth.users(id) on delete set null,
@@ -40,8 +40,8 @@ create table if not exists symbol_library (
 );
 
 -- Migrations : ajouter les colonnes si la table existe déjà
-alter table symbol_library add column if not exists label_prefix     text    default '';
-alter table symbol_library add column if not exists default_rotation integer default 0;
+alter table symbol_library add column if not exists label_prefix     text default '';
+alter table symbol_library add column if not exists default_rotation real default 0;
 
 alter table symbol_library enable row level security;
 

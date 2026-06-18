@@ -165,7 +165,7 @@ export default function App() {
     canvas.setSymbols(prev => prev.map(s => s.id === updated.id ? updated : s))
     // Sync to DB if it was a shared symbol
     if (updated._fromDb) {
-      await supabase.from('symbol_library').update({
+      const { error } = await supabase.from('symbol_library').update({
         name:             updated.name,
         display_width:    updated.displayWidth,
         display_height:   updated.displayHeight,
@@ -173,7 +173,8 @@ export default function App() {
         label_prefix:     updated.labelPrefix     || '',
         default_rotation: updated.defaultRotation ?? 0,
         bornes:           updated.bornes,
-      }).eq('id', updated.id).catch(() => {})
+      }).eq('id', updated.id)
+      if (error) console.warn('Erreur sauvegarde symbole:', error.message)
     }
   }
 
