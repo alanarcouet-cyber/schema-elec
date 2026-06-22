@@ -208,6 +208,12 @@ export default function useCanvas() {
     }))
   }, [])
 
+  const updateCommentProps = useCallback((id, props) => {
+    setState(prev => commit(prev, {
+      comments: prev.comments.map(c => c.id === id ? { ...c, ...props } : c),
+    }))
+  }, [])
+
   const updateCommentSize = useCallback((id, width, height) => {
     setState(prev => commit(prev, {
       comments: prev.comments.map(c => c.id === id ? { ...c, width, height } : c),
@@ -309,6 +315,7 @@ export default function useCanvas() {
     moveComment,
     updateComment,
     updateCommentSize,
+    updateCommentProps,
     reorderSymbols,
     updateCableLabel,
     loadState,

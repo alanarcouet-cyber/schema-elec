@@ -8,10 +8,12 @@ const LINE_H = 14
 const H_SIZE = 10   // resize handle size
 
 export default function CommentElement({ comment, isSelected, tool, onSelect, onMove, onDblClick, onResize }) {
-  const lines   = (comment.text || '').split('\n')
-  const autoH   = Math.max(MIN_H, lines.length * LINE_H + PAD * 2 + 4)
-  const width   = comment.width  || 180
-  const height  = comment.height || autoH
+  const lines     = (comment.text || '').split('\n')
+  const autoH     = Math.max(MIN_H, lines.length * LINE_H + PAD * 2 + 4)
+  const width     = comment.width    || 180
+  const height    = comment.height   || autoH
+  const rotation  = comment.rotation ?? 0
+  const highlight = comment.highlight ?? false
 
   const handleDragEnd = (e) => {
     const x = Math.round(e.target.x() / GRID) * GRID
@@ -25,7 +27,6 @@ export default function CommentElement({ comment, isSelected, tool, onSelect, on
     const newW = Math.max(MIN_W, e.target.x() + H_SIZE / 2)
     const newH = Math.max(MIN_H, e.target.y() + H_SIZE / 2)
     if (onResize) onResize(comment.id, newW, newH)
-    // Snap handle back to corner (React will re-render it correctly after state update)
     e.target.position({ x: newW - H_SIZE / 2, y: newH - H_SIZE / 2 })
   }
 
@@ -33,16 +34,17 @@ export default function CommentElement({ comment, isSelected, tool, onSelect, on
     <Group
       x={comment.x}
       y={comment.y}
+      rotation={rotation}
       draggable={tool === 'select'}
       onClick={(e)    => { e.cancelBubble = true; onSelect(comment.id) }}
       onDblClick={(e) => { e.cancelBubble = true; onDblClick(comment.id, comment.text) }}
       onDragEnd={handleDragEnd}
     >
-      {/* Body — transparent background */}
+      {/* Body */}
       <Rect
         width={width} height={height}
-        fill="transparent"
-        stroke={isSelected ? '#2563eb' : '#94a3b8'}
+        fill={highlight ? 'rgba(250, 204, 21, 0.35)' : 'transparent'}
+        stroke={isSelected ? '#2563eb' : (highlight ? '#ca8a04' : '#94a3b8')}
         strokeWidth={isSelected ? 1.5 : 1}
         dash={isSelected ? [5, 4] : [4, 3]}
         cornerRadius={3}

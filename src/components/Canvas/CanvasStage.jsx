@@ -221,6 +221,9 @@ export default function CanvasStage({ canvas, stageRef, remoteCursors = {}, onCu
   const selectedElement = canvas.elements.find(el => el.id === canvas.selectedId) ?? null
   const selectedSymbol  = selectedElement ? canvas.symbols.find(s => s.id === selectedElement.symbolId) : null
 
+  // Commentaire sélectionné
+  const selectedComment = canvas.comments.find(c => c.id === canvas.selectedId) ?? null
+
   // ── Pre-compute cable routes for overlap avoidance ───────────────────────
 
   const allCableRoutes = useMemo(() => {
@@ -395,6 +398,33 @@ export default function CanvasStage({ canvas, stageRef, remoteCursors = {}, onCu
             if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); commitComment() }
           }}
         />
+      )}
+
+      {/* Barre de contrôle flottante pour le commentaire sélectionné */}
+      {selectedComment && !editComment && canvas.tool === 'select' && (
+        <div className="comment-controls">
+          <button
+            className={`comment-ctrl-btn${selectedComment.highlight ? ' active' : ''}`}
+            title="Surligner en jaune"
+            onClick={() => canvas.updateCommentProps(selectedComment.id, { highlight: !selectedComment.highlight })}
+          >
+            ✦
+          </button>
+          <button
+            className="comment-ctrl-btn"
+            title="Rotation −90°"
+            onClick={() => canvas.updateCommentProps(selectedComment.id, { rotation: ((selectedComment.rotation ?? 0) - 90 + 360) % 360 })}
+          >
+            ↺
+          </button>
+          <button
+            className="comment-ctrl-btn"
+            title="Rotation +90°"
+            onClick={() => canvas.updateCommentProps(selectedComment.id, { rotation: ((selectedComment.rotation ?? 0) + 90) % 360 })}
+          >
+            ↻
+          </button>
+        </div>
       )}
 
       {canvas.tool === 'comment' && !editComment && (

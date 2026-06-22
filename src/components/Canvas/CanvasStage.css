@@ -88,6 +88,48 @@
   box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
 }
 
+.comment-controls {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.comment-ctrl-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  transition: background 0.15s, color 0.15s;
+}
+
+.comment-ctrl-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.comment-ctrl-btn.active {
+  background: #fef08a;
+  border-color: #ca8a04;
+  color: #854d0e;
+}
+
 .cable-hint {
   position: absolute;
   bottom: 16px;
