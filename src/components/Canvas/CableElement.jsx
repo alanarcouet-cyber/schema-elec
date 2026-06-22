@@ -37,6 +37,16 @@ export default function CableElement({
   const midX = (fromPos.x + toPos.x) / 2
   const midY = fromPos.y
 
+  // Angle du câble (orientation générale) pour aligner l'étiquette dessus
+  let labelAngle = Math.atan2(toPos.y - fromPos.y, toPos.x - fromPos.x) * 180 / Math.PI
+  // Garder le texte lisible (jamais à l'envers)
+  if (labelAngle > 90)  labelAngle -= 180
+  if (labelAngle < -90) labelAngle += 180
+
+  // Centre de l'étiquette : milieu réel du câble
+  const labelCx = (fromPos.x + toPos.x) / 2 + (cable.labelOffsetX || 0)
+  const labelCy = (fromPos.y + toPos.y) / 2 + (cable.labelOffsetY || 0)
+
   return (
     <>
       <Line
@@ -52,14 +62,17 @@ export default function CableElement({
       />
       {cable.label ? (
         <Text
-          x={midX + (cable.labelOffsetX || 0) - 30}
-          y={midY + (cable.labelOffsetY || 0) - 14}
+          x={labelCx}
+          y={labelCy}
           text={cable.label}
           fontSize={10}
           fontFamily="'Courier New', monospace"
           fill={color}
           width={60}
           align="center"
+          offsetX={30}
+          offsetY={12}
+          rotation={labelAngle}
           listening={false}
         />
       ) : null}
