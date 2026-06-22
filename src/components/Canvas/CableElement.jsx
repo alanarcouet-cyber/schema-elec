@@ -70,8 +70,9 @@ export default function CableElement({
           fill={color}
           width={60}
           align="center"
+          lineHeight={1.6}
           offsetX={30}
-          offsetY={12}
+          offsetY={16}
           rotation={labelAngle}
           listening={false}
         />
