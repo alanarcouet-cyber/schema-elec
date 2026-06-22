@@ -40,29 +40,38 @@ function getBoundingBox(canvas) {
 }
 
 /**
- * Convertit une bounding-box en coordonnées monde → coordonnées pixel scène
- * (applique le zoom et la translation courants de la vue).
+ * Capture le stage en réinitialisant temporairement son transform (position 0,0 / scale 1)
+ * de sorte que les coordonnées monde = coordonnées pixel canvas, indépendamment du zoom
+ * navigateur (devicePixelRatio) ou du zoom/déplacement en cours dans la vue.
  */
-function worldBboxToStage(stage, bbox) {
-  if (!bbox) return null
-  const tf     = stage.getAbsoluteTransform()
-  const topLeft = tf.point({ x: bbox.x,              y: bbox.y })
-  const botRight = tf.point({ x: bbox.x + bbox.width, y: bbox.y + bbox.height })
-  return {
-    x:      topLeft.x,
-    y:      topLeft.y,
-    width:  botRight.x - topLeft.x,
-    height: botRight.y - topLeft.y,
-  }
+function captureDataURL(stage, worldBbox, pixelRatio = 2) {
+  // Sauvegarde de l'état courant
+  const savedX  = stage.x()
+  const savedY  = stage.y()
+  const savedSx = stage.scaleX()
+  const savedSy = stage.scaleY()
+
+  // Reset : transform identité → coordonnées monde == coordonnées pixel
+  stage.position({ x: 0, y: 0 })
+  stage.scale({ x: 1, y: 1 })
+  stage.batchDraw()
+
+  const uri = stage.toDataURL({ pixelRatio, ...(worldBbox ?? {}) })
+
+  // Restauration
+  stage.position({ x: savedX, y: savedY })
+  stage.scale({ x: savedSx, y: savedSy })
+  stage.batchDraw()
+
+  return uri
 }
 
 export function exportToPNG(stageRef, canvas) {
   const stage = stageRef.current
   if (!stage) return
 
-  const worldBbox = canvas ? getBoundingBox(canvas) : null
-  const bbox      = worldBbox ? worldBboxToStage(stage, worldBbox) : null
-  const uri  = stage.toDataURL({ pixelRatio: 2, ...(bbox ?? {}) })
+  const bbox = canvas ? getBoundingBox(canvas) : null
+  const uri  = captureDataURL(stage, bbox)
 
   const a = document.createElement('a')
   a.download = 'schema.png'
@@ -74,8 +83,7 @@ export function exportToPDF(stageRef, orientation = 'landscape', canvas) {
   const stage = stageRef.current
   if (!stage) return
 
-  const worldBbox = canvas ? getBoundingBox(canvas) : null
-  const bbox      = worldBbox ? worldBboxToStage(stage, worldBbox) : null
+  const bbox = canvas ? getBoundingBox(canvas) : null
 
   // Dimensions A4 en mm
   const pageW = orientation === 'landscape' ? 297 : 210
@@ -98,7 +106,7 @@ export function exportToPDF(stageRef, orientation = 'landscape', canvas) {
     }
   }
 
-  const uri = stage.toDataURL({ pixelRatio: 2, ...(bbox ?? {}) })
+  const uri = captureDataURL(stage, bbox)
   const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' })
   pdf.addImage(uri, 'PNG', imgX, imgY, imgW, imgH)
   pdf.save('schema.pdf')
