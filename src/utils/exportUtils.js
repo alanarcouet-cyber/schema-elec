@@ -39,11 +39,29 @@ function getBoundingBox(canvas) {
   }
 }
 
+/**
+ * Convertit une bounding-box en coordonnées monde → coordonnées pixel scène
+ * (applique le zoom et la translation courants de la vue).
+ */
+function worldBboxToStage(stage, bbox) {
+  if (!bbox) return null
+  const tf     = stage.getAbsoluteTransform()
+  const topLeft = tf.point({ x: bbox.x,              y: bbox.y })
+  const botRight = tf.point({ x: bbox.x + bbox.width, y: bbox.y + bbox.height })
+  return {
+    x:      topLeft.x,
+    y:      topLeft.y,
+    width:  botRight.x - topLeft.x,
+    height: botRight.y - topLeft.y,
+  }
+}
+
 export function exportToPNG(stageRef, canvas) {
   const stage = stageRef.current
   if (!stage) return
 
-  const bbox = canvas ? getBoundingBox(canvas) : null
+  const worldBbox = canvas ? getBoundingBox(canvas) : null
+  const bbox      = worldBbox ? worldBboxToStage(stage, worldBbox) : null
   const uri  = stage.toDataURL({ pixelRatio: 2, ...(bbox ?? {}) })
 
   const a = document.createElement('a')
@@ -56,7 +74,8 @@ export function exportToPDF(stageRef, orientation = 'landscape', canvas) {
   const stage = stageRef.current
   if (!stage) return
 
-  const bbox = canvas ? getBoundingBox(canvas) : null
+  const worldBbox = canvas ? getBoundingBox(canvas) : null
+  const bbox      = worldBbox ? worldBboxToStage(stage, worldBbox) : null
 
   // Dimensions A4 en mm
   const pageW = orientation === 'landscape' ? 297 : 210
